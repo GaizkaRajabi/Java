@@ -1,0 +1,126 @@
+import java.io.*;
+import java.lang.*;
+import java.awt.event.*;
+import java.awt.*;
+import java.sql.*;
+import java.util.logging.Level;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class database {
+    static JFrame jp = new JFrame ("Data Laundry");
+    static JTable tabel = new JTable();
+    static JScrollPane sp = new JScrollPane(tabel);
+    static JLabel delete = new JLabel ("no order yang ingin dihapus");
+    static JTextField txtno_order = new JTextField();
+    static JButton btndelete = new JButton("Hapus Data");
+    static JButton keluar = new JButton("Keluar");
+    
+    public static void main (String [] args) {
+        panggil();
+    }
+    
+    static void panggil() {
+        Connection con;
+        Statement stat;
+        ResultSet res;
+        
+        DefaultTableModel tbl = new DefaultTableModel();
+        tbl.addColumn("No Order");
+        tbl.addColumn("Nama");
+        tbl.addColumn("Tanggal Cuci");
+        tbl.addColumn("kategori");
+        tbl.addColumn("Harga Layanan");
+        tbl.addColumn("Total Berat");
+        tbl.addColumn("Total Harga");
+        tabel.setModel(tbl);
+        
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/laundry","root","");
+            stat = con.createStatement();
+            res = stat.executeQuery("select * from cuci");
+            
+            while (res.next()){
+                tbl.addRow(new Object[]{
+                    res.getString("no_order"),
+                    res.getString("nama"),
+                    res.getString("tgl_cuci"),
+                    res.getString("kategori"),
+                    res.getString("harga_layanan"),
+                    res.getString("berat"),
+                    res.getString("total")
+                });
+            }
+            
+        }catch (ClassNotFoundException | SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        
+        jp.add(delete);
+        jp.add(txtno_order);
+        jp.add(btndelete);
+        jp.add(keluar);
+        jp.add(sp);
+        
+        jp.setSize(1300,400);
+        jp.setLocationRelativeTo(null);
+        jp.setVisible(true);
+        delete.setBounds(100,320,300,30);
+        txtno_order.setBounds(285,320,80,30);
+        btndelete.setBounds(380,320,120,30);
+        keluar.setBounds(500,320,120,30);
+        
+        btndelete.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try { 
+                        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/laundry","root","");
+                        con.createStatement().executeUpdate("delete from cuci where no_order like '"+txtno_order.getText()+"' ;");
+                        
+                        Statement stat;
+                        ResultSet res;
+                        
+                        DefaultTableModel tbl = new DefaultTableModel();
+                        tbl.addColumn("No Order");
+                        tbl.addColumn("Nama");
+                        tbl.addColumn("Tanggal Cuci");
+                        tbl.addColumn("Kategori");
+                        tbl.addColumn("Harga Layanan");
+                        tbl.addColumn("Berat");
+                        tbl.addColumn("Harga");
+                        
+                        tabel.setModel(tbl);
+                            try {
+                                Class.forName("com.mysql.jdbc.Driver");
+                                con = DriverManager.getConnection("jdbc:mysql://localhost/laundry","root","");
+                                stat = con.createStatement();
+                                res = stat.executeQuery("select * from cuci");
+                                    while (res.next()){
+                                        tbl.addRow(new Object[]{
+                                            res.getString("no_order"),
+                                            res.getString("nama"),
+                                            res.getString("tgl_cuci"),
+                                            res.getString("kategori"),
+                                            res.getString("harga_layanan"),
+                                            res.getString("berat"),
+                                            res.getString("total")
+                                            });
+                                    }
+                                    
+                            }catch (ClassNotFoundException | SQLException ez) {
+                                JOptionPane.showMessageDialog(null, ez);
+                            }
+                                JOptionPane.showMessageDialog(null, "Data Berhasil Terhapus");
+                                txtno_order.setText("");
+                            }catch (Exception ez) {
+                                JOptionPane.showMessageDialog(null,ez);
+                            }
+            }
+        });
+        keluar.addActionListener(new ActionListener(){
+        public void actionPerformed (java.awt.event.ActionEvent evt){
+            System.exit(0);
+            }
+        });
+    }
+}
