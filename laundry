@@ -1,0 +1,371 @@
+import java.awt.*; //digunakan untuk proses inputan
+import java.sql.*; //mengimport class untuk mendukung akses dan pengelohan data dalam database
+import java.util.logging.Level; //mengimport class yang mendukung utilitas struktur java
+import javax.swing.*; //untuk bisa mengakses komponen GUI java
+import javax.swing.table.DefaultTableModel; //komponen gui java yang menyediakan tampilan model
+
+public class laundry extends javax.swing.JFrame {
+    private Connection con; //menyimpan koneksi ke database
+    private Statement stat; //menangani perintah SQL ke database
+    private ResultSet res; //menampung data hasil perintah ke database
+    private JButton hitung, reset, cari, simpan, db; //untuk tombol
+    private JLabel j11, j12, j13, j14, j15, j16, j17, j18, j19, intro, menu1, menu2, menu3, menu4, menu5, menu6; //untuk text
+    private JTextField no_order, nama, tgl_cuci, tgl_ambil, harga_layanan, berat, total, layanan; //untuk text yang dapat diedit oleh user
+    private JComboBox kategori;
+    private JPanel panel; //container component (wadah komponen)
+    
+    public laundry(){
+        setTitle("Bidadari Laundry");
+        koneksi();
+        tampilan();
+        //tabel();
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = getSize();
+        setLocation(
+                (screenSize.width - frameSize.width)/2,
+                (screenSize.height - frameSize.height)/2);
+    }
+    
+    public void koneksi(){
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/laundry","root","");
+            stat = con.createStatement();
+        }catch (ClassNotFoundException | SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
+    private void kosongkan(){
+        no_order.setText("");
+        nama.setText("");
+        tgl_cuci.setText("");
+        berat.setText("");
+        harga_layanan.setText("");
+        total.setText("");
+        no_order.requestFocus();
+    }
+    
+    public void tabel(){
+        DefaultTableModel tb = new DefaultTableModel(); //memberikan header dan data pada kolom dan baris table
+        
+        try{
+            res = stat.executeQuery("select * from cuci");
+            while (res.next()){
+                tb.addRow(new Object[]{ //membahkan baris data pada objek tabel
+                    res.getString("no_order"), //menambahkan baris data pada kolom no_order
+                    res.getString("nama"), //menambahkan baris data pada kolom nama
+                    res.getString("tgl_cuci"),
+                    res.getString("kategori"),
+                    res.getString("harga_layanan"),
+                    res.getString("berat"),
+                    res.getString("total")});
+                }
+            }catch (SQLException e){
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    
+        public void tampilan(){
+            j11 = new JLabel();
+            j12 = new JLabel();
+            j13 = new JLabel();
+            j14 = new JLabel();
+            j15 = new JLabel();
+            j16 = new JLabel();
+            j17 = new JLabel();
+            j18 = new JLabel();
+            intro = new JLabel();
+            menu1 = new JLabel();
+            menu2 = new JLabel();
+            menu3 = new JLabel();
+            menu4 = new JLabel();
+            menu5 = new JLabel();
+            menu6 = new JLabel();
+            
+            setBounds(370,150,1000,400);
+            panel = new JPanel();
+            setContentPane(panel);
+            panel.setBackground(Color.decode("#F8C8DC"));
+            panel.setLayout(null);
+            setLocationRelativeTo(null);
+            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            
+            JLabel judul = new JLabel("BIDADARI LAUNDRY");
+            judul.setFont(new Font("Lucida Bright",Font.PLAIN,18));
+            judul.setBounds(320,1,400,20);
+            panel.add(judul);
+
+            JLabel subjudul = new JLabel("Membuat Pakaian anda Suci dan Bersih Seperti Bidadari");
+            subjudul.setFont(new Font("Lucida Bright",Font.PLAIN,12));
+            subjudul.setBounds(255,19,400,20);
+            panel.add(subjudul);
+            
+            j11.setText("No Order");
+            j11.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j11.setBounds(5,51,130,20);
+            panel.add(j11);
+            
+            j12.setText("Nama Pelanggan");
+            j12.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j12.setBounds(5,81,130,20);
+            panel.add(j12);
+            
+            j13.setText("Tanggal Cuci");
+            j13.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j13.setBounds(5,111,130,20);
+            panel.add(j13);
+            
+            j15.setText("Kategori");
+            j15.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j15.setBounds(5,141,130,20);
+            panel.add(j15);
+            
+            j16.setText("Harga Layanan");
+            j16.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j16.setBounds(5,171,130,20);
+            panel.add(j16);
+            
+            j17.setText("Total Berat");
+            j17.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j17.setBounds(5,201,130,20);
+            panel.add(j17);
+            
+            j18.setText("Total Harga");
+            j18.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            j18.setBounds(5,231,130,20);
+            panel.add(j18);
+            
+            intro.setText("Kategori");
+            JLabel harga = new JLabel("Harga");
+            intro.setFont(new Font("Times New Roman",Font.PLAIN,18));
+            harga.setFont(new Font("Times New Roman",Font.PLAIN,18));
+            intro.setBounds(550,51,280,30);
+            harga.setBounds(800,51,220,20);
+            panel.add(intro);
+            panel.add(harga);
+            
+            menu1.setText("1. Laundry Komplit Reguler (1-2 hari)");
+            JLabel m1 = new JLabel("Rp.9.000");
+            menu1.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m1.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu1.setBounds(550,81,400,20);
+            m1.setBounds(800,81,220,20);
+            panel.add(menu1);
+            panel.add(m1);
+            
+            menu2.setText("2. Laundry Komplit Kilat (6 jam)");
+            JLabel m2 = new JLabel("Rp.14.000");
+            menu2.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m2.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu2.setBounds(550,111,400,20);
+            m2.setBounds(800,111,220,20);
+            panel.add(menu2);
+            panel.add(m2);
+            
+            menu3.setText("3. Laundry Kering Reguler (1-3 hari)");
+            JLabel m3 = new JLabel("Rp.8.000");
+            menu3.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m3.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu3.setBounds(550,141,400,20);
+            m3.setBounds(800,141,220,20);
+            panel.add(menu3);
+            panel.add(m3);
+            
+            menu4.setText("4. Laundry Kering Ekspress (6 jam)");
+            JLabel m4 = new JLabel("Rp.9.000");
+            menu4.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m4.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu4.setBounds(550,171,400,20);
+            m4.setBounds(800,171,220,20);
+            panel.add(menu4);
+            panel.add(m4);
+            
+            menu5.setText("5. Setrika Reguler (2-3 hari)");
+            JLabel m5 = new JLabel("Rp.7.000");
+            menu5.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m5.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu5.setBounds(550,201,400,20);
+            m5.setBounds(800,201,220,20);
+            panel.add(menu5);
+            panel.add(m5);
+            
+            menu6.setText("6. Setrika Ekspress (6 jam)");
+            JLabel m6 = new JLabel("Rp.9.000");
+            menu6.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            m6.setFont(new Font("Times New Roman",Font.PLAIN,16));
+            menu6.setBounds(550,231,400,20);
+            m6.setBounds(800,231,220,20);
+            panel.add(menu6);
+            panel.add(m6);
+            
+            no_order = new JTextField();
+            no_order.setBounds(150,51,280,30);
+            panel.add(no_order);
+            
+            nama = new JTextField();
+            nama.setBounds(150,81,280,30);
+            panel.add(nama);
+            
+            tgl_cuci = new JTextField();
+            tgl_cuci.setBounds(150,111,280,30);
+            panel.add(tgl_cuci);
+            
+            kategori = new JComboBox();
+            kategori.addItem("Laundry Komplit Reguler (1-2 hari)");
+            kategori.addItem("Laundry Komplit Kilat (6 jam)");
+            kategori.addItem("Laundry Kering Reguler (1-3 hari)");
+            kategori.addItem("Laundry Kering Ekspress (6 jam)");
+            kategori.addItem("Setrika Reguler (2-3 hari)");
+            kategori.addItem("Setrika Ekspress (6 jam)");
+            kategori.setBounds(150,141,280,30);
+            panel.add(kategori);
+            
+            harga_layanan = new JTextField();
+            harga_layanan.setBounds(150,171,280,30);
+            panel.add(harga_layanan);
+
+            berat = new JTextField();
+            berat.setBounds(150,201,280,30);
+            panel.add(berat);
+            
+            total = new JTextField();
+            total.setBounds(150,231,280,30);
+            panel.add(total);
+            
+            cari = new JButton();
+            cari.setText("CARI");
+            cari.setBounds(170,261,100,30);
+            panel.add(cari);
+            
+            simpan = new JButton();
+            simpan.setText("SIMPAN");
+            simpan.setBounds(50,261,100,30);
+            panel.add(simpan);
+            
+            reset = new JButton();
+            reset.setText("RESET");
+            reset.setBounds(290,261,100,30);
+            panel.add(reset);
+            
+            db = new JButton();
+            db.setText("DATA LAUNDRY");
+            db.setBounds(410,261,150,30);
+            panel.add(db);
+            
+            hitung = new JButton();
+            hitung.setText("HITUNG");
+            hitung.setBounds(450,231,100,30);
+            panel.add(hitung);
+            
+            //actionlistener = menjadikan button yang telah dibuat mempunyai aksi
+            //actionpeformed = untuk mendeteksi penekanan button
+            cari.addActionListener(new java.awt.event.ActionListener(){
+                public void actionPerformed (java.awt.event.ActionEvent evt){
+                    CariActionPerformed(evt);
+                }
+            });
+            
+            simpan.addActionListener(new java.awt.event.ActionListener(){
+                public void actionPerformed (java.awt.event.ActionEvent evt){
+                    SimpanActionPerformed(evt);
+                }
+            });
+            
+            reset.addActionListener(new java.awt.event.ActionListener(){
+                public void actionPerformed (java.awt.event.ActionEvent evt){
+                    resetActionPerformed(evt);
+                }
+            });
+            
+            db.addActionListener(new java.awt.event.ActionListener(){
+                public void actionPerformed (java.awt.event.ActionEvent evt){
+                    setVisible(false);
+                    database.panggil();
+                }
+            });
+
+            hitung.addActionListener(new java.awt.event.ActionListener(){
+                public void actionPerformed (java.awt.event.ActionEvent evt){
+                    hitungActionPerformed(evt);
+                }
+            });    
+        }
+        private void CariActionPerformed(java.awt.event.ActionEvent evt){
+            try{
+                koneksi();
+                res = stat.executeQuery("select * from cuci where no_order='" + no_order.getText()+"';");
+                if (res.next())
+                {
+                    nama.setText(res.getString("nama"));
+                    tgl_cuci.setText(res.getString("tgl_cuci"));
+                    kategori.setSelectedItem(res.getString("Kategori"));
+                    berat.setText(res.getString("berat"));
+                    total.setText(res.getString("total"));
+                }else{
+                    JOptionPane.showMessageDialog(null,"Data Tidak Ditemukan");
+                }
+            }catch(SQLException | HeadlessException e){
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+        private void resetActionPerformed(java.awt.event.ActionEvent evt){
+            kosongkan();
+        }
+        private void SimpanActionPerformed(java.awt.event.ActionEvent evt){
+            koneksi();
+            try{
+                stat.executeUpdate("insert into cuci values ("
+                + "'" + no_order.getText()+"',"
+                + "'" + nama.getText()+"',"
+                + "'" + tgl_cuci.getText()+"',"
+                + "'" + kategori.getSelectedItem()+"',"
+                + "'" + harga_layanan.getText()+"',"
+                + "'" + berat.getText()+"',"
+                + "'" + total.getText()+"');");
+                kosongkan();
+                tabel();
+                JOptionPane.showMessageDialog(null,"Berhasil Menyimpan Data");
+            }catch (SQLException | HeadlessException e){
+                JOptionPane.showMessageDialog(null, "Data Belum Lengkap");
+            }
+        }
+        private void hitungActionPerformed(java.awt.event.ActionEvent evt){
+            double a = Double.parseDouble(berat.getText());
+            double b = Double.parseDouble(harga_layanan.getText());
+            double hasil = a*b;
+            String totalh = Double.toString(hasil);
+            total.setText(totalh);
+        }
+        
+        public static void main(String[] args) {
+            
+            try{
+                for(javax.swing.UIManager.LookAndFeelInfo info:javax.swing.UIManager.getInstalledLookAndFeels())
+                {
+                    if("Nimbus".equals(info.getName())){
+                        javax.swing.UIManager.setLookAndFeel((info.getClassName()));
+                        break;
+                    }
+                }
+                  
+                
+            }catch (ClassNotFoundException ex){
+                java.util.logging.Logger.getLogger(laundry.class.getName()).log(Level.SEVERE,null,ex);
+                //instanstionexception = Akses terhadap kelas tidak diizinkan
+            }catch (InstantiationException ex){
+                java.util.logging.Logger.getLogger(laundry.class.getName()).log(Level.SEVERE,null,ex);
+            }catch (IllegalAccessException ex){
+                java.util.logging.Logger.getLogger(laundry.class.getName()).log(Level.SEVERE,null,ex);
+            }catch (javax.swing.UnsupportedLookAndFeelException ex){
+                java.util.logging.Logger.getLogger(laundry.class.getName()).log(Level.SEVERE,null,ex);
+            }
+            java.awt.EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run() {
+                    new laundry().setVisible(true);
+                }
+            });
+        }
+}
